@@ -17,6 +17,7 @@ suffix_sets = [
 	[ 'y', 'ily', 'ier', 'iest', 'ilier', 'iliest' ],
 	[ '', 'ly', 'er', 'est', 'lier', 'liest' ],
 	[ '', "'s", "s'" ],
+	#Theoretically, this list could be turned into a list of suffixes to expand into “___ will”, “____ would”, “____ not”, etc. But all of those words should be in the ignore list anyway, so reconstructing them gains nothing; we might as well simply destroy them here.
 	[ '', "'ll", "'d", "'t", "'re", "'ve", "'m" ],
 ]
 
