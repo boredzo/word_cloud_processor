@@ -9,7 +9,7 @@ import fileinput
 import csv
 import operator
 import collections
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Set, Optional
 
 suffix_sets = [
 	[ 'ate', 'ates', 'ating', 'ated', 'ation' ],
@@ -293,9 +293,16 @@ class TokenCollector(object):
 class WordHistogramAccumulator(object):
 	def __init__(self):
 		self.counts = collections.Counter()
+		self.ignore_list = set()
 
 	def add_word(self, word: str):
-		self.counts[FuzzyString(word)] += 1
+		word = FuzzyString(word)
+		if word not in self.ignore_list:
+			self.counts[word] += 1
+
+	def ignore(self, words: Set[FuzzyString]):
+		"Given a set of words, add them to the set of words to be ignored."
+		self.ignore_list.update(words)
 
 	def __iter__(self):
 		return iter(self.counts.items())
@@ -329,6 +336,17 @@ def main(opts):
 					# Not every row will fill out all columns (because the rows don't all have equal numbers of synonyms). Ignore empty cells.
 					continue
 				synonyms_graph.add_raw_tokens(raw_tokens, final_token)
+
+	ignore_list = set()
+	if opts.ignore_list_path:
+		ignore_file = open(opts.ignore_list_path, 'r')
+		for line in ignore_file:
+			idx = line.find('#')
+			if idx >= 0:
+				line = line[idx:]
+			line = line.strip()
+			for raw_token in raw_tokens_from_string(line):
+				ignore_list.add(FuzzyString(raw_token))
 
 	texts_csv_file = open(opts.input_csv_path, 'r') if opts.input_csv_path else sys.stdin
 	texts_csv = csv.reader(texts_csv_file)
@@ -454,6 +472,7 @@ TestCase('Recognizing word tokens from a barely-started match', [ 'Congratulatin
 if __name__ == '__main__':	
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--synonyms', dest='synonyms_csv_path', default=None, type=pathlib.Path, help='Path to a CSV file listing synonyms. Each row is one group of synonyms; each item in the row is one term that is synonymous with all other terms in the group.')
+	parser.add_argument('--ignore', dest='ignore_list_path', default=None, type=pathlib.Path, help='Path to a text file listing words to ignore. Each line is one singular word; no phrases are allowed. This should generally be a list of words like "the" and "an" that you don\'t care about. You can usually generate this list by selecting the most frequent words in a sufficiently large corpus.')
 	parser.add_argument('--self-test', default=False, action='store_true', help='Run internal self-tests. For development only.')
 	parser.add_argument('input_csv_path', metavar='input.csv', default=None, type=pathlib.Path, help='Path to a CSV file containing source texts. The "Source text" column, if a column is so named, will be used; otherwise, the first column will be used.')
 	opts = parser.parse_args()
