@@ -340,6 +340,8 @@ def main(opts):
 					# Not every row will fill out all columns (because the rows don't all have equal numbers of synonyms). Ignore empty cells.
 					continue
 				synonyms_graph.add_raw_tokens(raw_tokens, final_token)
+	if opts.show_synonym_graph:
+		print(synonyms_graph.reprtree())
 
 	ignore_list = set()
 	if opts.ignore_list_path:
@@ -480,6 +482,7 @@ if __name__ == '__main__':
 	parser.add_argument('--synonyms', dest='synonyms_csv_path', default=None, type=pathlib.Path, help='Path to a CSV file listing synonyms. Each row is one group of synonyms; each item in the row is one term that is synonymous with all other terms in the group.')
 	parser.add_argument('--ignore', dest='ignore_list_path', default=None, type=pathlib.Path, help='Path to a text file listing words to ignore. Each line is one singular word; no phrases are allowed. This should generally be a list of words like "the" and "an" that you don\'t care about. You can usually generate this list by selecting the most frequent words in a sufficiently large corpus.')
 	parser.add_argument('--self-test', default=False, action='store_true', help='Run internal self-tests. For development only.')
+	parser.add_argument('--show-synonym-graph', default=False, action='store_true', help='Dump a graph of the synonym pool before the output.')
 	parser.add_argument('input_csv_path', metavar='input.csv', default=None, type=pathlib.Path, help='Path to a CSV file containing source texts. The "Source text" column, if a column is so named, will be used; otherwise, the first column will be used.')
 	opts = parser.parse_args()
 
