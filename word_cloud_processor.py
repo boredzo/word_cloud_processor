@@ -68,6 +68,8 @@ class FuzzyString(str):
 		return hash(self.cached_stem)
 	def __eq__(self, other):
 		return words_equal(str(self), str(other))
+	def __repr__(self):
+		return '\u2248' + repr(str(self))
 
 class TokenGraphNode(object):
 	def __init__(self, label: str):
