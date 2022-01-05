@@ -17,7 +17,7 @@ suffix_sets = [
 	[ 'y', 'ily', 'ier', 'iest', 'ilier', 'iliest' ],
 	[ '', 'ly', 'er', 'est', 'lier', 'liest' ],
 	[ '', "'s", "s'" ],
-	[ '', "'ll", "'d", "'t", "'re", "'ve" ],
+	[ '', "'ll", "'d", "'t", "'re", "'ve", "'m" ],
 ]
 
 def words_equal(word_a, word_b):
