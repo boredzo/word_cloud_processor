@@ -221,7 +221,11 @@ def raw_tokens_from_string(s: str,
 		match = _exp.match(s)
 		if match:
 			s = s[match.end() + 1:]
-			yield match.group(0)
+			word = match.group(0)
+			apostrophe_index = word.find("'")
+			if apostrophe_index >= 0:
+				word = word[:apostrophe_index]
+			yield word
 		else:
 			match = _hashtagExp.match(s)
 			if match:
@@ -357,6 +361,7 @@ def main(opts):
 		text_idx = 0
 
 	histogram = WordHistogramAccumulator()
+	histogram.ignore(ignore_list)
 	recognizer = TokenRecognizer(synonyms_graph, histogram.add_word)
 
 	for row in texts_csv:
@@ -429,6 +434,7 @@ def self_test():
 		TestCase('Raw tokens from hashtag', [ 'Black', 'Lives', 'Matter' ], lambda test: list(raw_tokens_from_string('#BlackLivesMatter'))),
 		TestCase('Raw tokens from hashtag + Twitter handle', [ 'CA27', 'officially', 'rated', 'a', 'Toss', 'Up', 'by', 'Cook', 'Political' ], lambda test: list(raw_tokens_from_string('''#CA27 officially rated a Toss Up by 
 @CookPolitical'''))),
+		TestCase('Raw tokens from sentence including possessive', [ 'I', 'love', 'Kyle', 'barbecue' ], lambda test: list(raw_tokens_from_string("I love Kyle's barbecue"))),
 		TestCase('Raw tokens from simple string', [ 'Black', 'lives', 'matter' ], lambda test: list(raw_tokens_from_string('Black lives matter'))),
 		TestCase('Raw tokens from hyphenated string', [ 'Black', 'lives', 'matter' ], lambda test: list(raw_tokens_from_string('Black-lives-matter'))),
 		TestCase('Raw tokens from punctuation-riddled string', [ 'Black', 'lives', 'matter' ], lambda test: list(raw_tokens_from_string('"Black! lives! matter!!!"'))),
