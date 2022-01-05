@@ -207,7 +207,7 @@ class TokenGraphNode(object):
 	def __getitem__(self, key):
 		"Given a raw token, return the child node matching that raw token, or None if there is no such child."
 		try:
-			return self.children[key]
+			return self.children[FuzzyString(key)]
 		except KeyError:
 			return None
 
